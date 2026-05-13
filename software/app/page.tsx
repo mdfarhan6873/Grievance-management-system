@@ -35,51 +35,150 @@ import {
   FiMessageSquare
 } from "react-icons/fi";
 import { HiMegaphone } from "react-icons/hi2";
+import { TfiWrite } from "react-icons/tfi";
+
+type Language = 'en' | 'hi';
 
 export default function Home() {
+  const [lang, setLang] = useState<Language>('en');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  const announcements = [
-    { date: "24 Oct 2024", title: "Planned Water Outage for Munger East Wards", desc: "Maintenance work on the main reservoir will cause a 6-hour outage.", category: "Water Dept" },
-    { date: "22 Oct 2024", title: "Clean Munger Green Munger Drive", desc: "Join the Nagar Nigam for a community cleaning drive at Munger Fort.", category: "Environment" },
-    { date: "19 Oct 2024", title: "Property Tax Collection Camp in Ward 15", desc: "Local camp for property tax collection and assessment.", category: "Finance" },
-    { date: "15 Oct 2024", title: "New Traffic Regulations in Market Area", desc: "To reduce congestion, new one-way rules apply from next Monday.", category: "Traffic" },
-    { date: "12 Oct 2024", title: "Street Light Maintenance - Zone B", desc: "Routine maintenance of street lights in Zone B starting tonight.", category: "Public Works" },
-    { date: "10 Oct 2024", title: "Public Hearing on Urban Development Plan", desc: "Invitation to citizens to provide feedback on the 2025 city plan.", category: "Planning" },
-    { date: "05 Oct 2024", title: "Monsoon Health Advisory", desc: "Preventive measures against water-borne diseases during monsoon.", category: "Health" },
-    { date: "02 Oct 2024", title: "Swachh Bharat Abhiyan Ceremony", desc: "Special event to mark Gandhi Jayanti and city cleanliness awards.", category: "General" },
-    { date: "28 Sep 2024", title: "Digital Literacy Workshop for Seniors", desc: "Free workshop on using municipal digital services for senior citizens.", category: "Education" },
-    { date: "25 Sep 2024", title: "Park Renovation in Civil Lines", desc: "Civil Lines Park will be closed for 2 weeks for landscaping work.", category: "Leisure" },
-    { date: "20 Sep 2024", title: "Anti-Encroachment Drive - Phase 2", desc: "Scheduled drive to remove illegal structures near the railway station.", category: "Enforcement" }
-  ];
+  const t = {
+    en: {
+      lang_switch: "English / हिन्दी",
+      portal_title: "Nagar Nigam Munger Redressal Portal",
+      hindi_subtitle: "नगर निगम मुंगेर शिकायत निवारण पोर्टल",
+      dept_login: "Department Login",
+      nav_home: "Home",
+      nav_grievances: "Grievances",
+      nav_announcements: "Announcements",
+      nav_services: "Services",
+      hero_tag: "GOVERNMENT OF BIHAR",
+      hero_subtag: "NAGAR NIGAM MUNGER",
+      hero_title: "Nagar Nigam Munger",
+      hero_accent: "Redressal Portal",
+      hero_desc: "A unified digital gateway for citizens of Munger to report, monitor, and resolve urban municipal issues. Committed to transparent, accountable, and responsive governance.",
+      hero_btn_reg: "Register Grievance",
+      hero_btn_login: "Citizen Login",
+      hero_track_placeholder: "Enter your Complaint ID to track status...",
+      hero_track_btn: "Track Status",
+      ann_title: "Official Announcements",
+      ann_date: "Date",
+      ann_details: "Announcement Details",
+      ann_cat: "Category",
+      ann_action: "Action",
+      ann_view_details: "View Details",
+      ann_view_all: "View All Announcements",
+      ann_show_less: "Show Less",
+      svc_title: "Report an Issue",
+      svc_desc: "Select a category to lodge your grievance. We are here to help resolve your concerns.",
+      svc_view_all: "View All Categories",
+      svc_file_btn: "File Complaint",
+      faq_title: "Frequently Asked Questions",
+      faq_desc: "Find quick answers to common queries regarding our redressal system.",
+      footer_about: "Dedicated to providing efficient, transparent, and citizen-centric municipal grievance redressal services to the people of Munger.",
+      footer_links: "Grievance Services",
+      footer_info: "Citizen Information",
+      footer_nodal: "Nodal Officers",
+      footer_rights: "All rights reserved.",
+      footer_dev: "Developed by",
+      footer_dir: "Under the direction of",
+      footer_cont: "Contributors",
+      footer_managed: "Managed by",
+      svc_list: [
+        { title: "Sanitation", desc: "Report garbage pile-up or irregular collection.", icon: <FiTrash2 /> },
+        { title: "Water Supply", desc: "Lodge complaints regarding water leakage.", icon: <FiDroplet /> },
+        { title: "Street Lights", desc: "Report non-functional street lights.", icon: <FiZap /> },
+        { title: "Roads", desc: "Report potholes or illegal road blockage.", icon: <FiMap /> },
+        { title: "Encroachment", desc: "Report illegal construction on public land.", icon: <FiHome /> },
+        { title: "Public Health", desc: "Report stray animals or health hazards.", icon: <FiAlertCircle /> }
+      ]
+    },
+    hi: {
+      lang_switch: "हिन्दी / English",
+      portal_title: "नगर निगम मुंगेर शिकायत निवारण पोर्टल",
+      hindi_subtitle: "Nagar Nigam Munger Redressal Portal",
+      dept_login: "विभाग लॉगिन",
+      nav_home: "मुख्य पृष्ठ",
+      nav_grievances: "शिकायतें",
+      nav_announcements: "घोषणाएं",
+      nav_services: "सेवाएं",
+      hero_tag: "बिहार सरकार",
+      hero_subtag: "नगर निगम मुंगेर",
+      hero_title: "नगर निगम मुंगेर",
+      hero_accent: "निवारण पोर्टल",
+      hero_desc: "मुंगेर के नागरिकों के लिए शहरी नगर पालिका मुद्दों की रिपोर्ट करने, निगरानी करने और समाधान करने के लिए एक एकीकृत डिजिटल गेटवे। पारदर्शी, जवाबदेह और उत्तरदायी शासन के लिए प्रतिबद्ध।",
+      hero_btn_reg: "शिकायत दर्ज करें",
+      hero_btn_login: "नागरिक लॉगिन",
+      hero_track_placeholder: "स्थिति ट्रैक करने के लिए शिकायत आईडी दर्ज करें...",
+      hero_track_btn: "स्थिति देखें",
+      ann_title: "आधिकारिक घोषणाएं",
+      ann_date: "दिनांक",
+      ann_details: "घोषणा विवरण",
+      ann_cat: "श्रेणी",
+      ann_action: "कार्य",
+      ann_view_details: "विवरण देखें",
+      ann_view_all: "सभी घोषणाएं देखें",
+      ann_show_less: "कम दिखाएं",
+      svc_title: "मुद्दे की रिपोर्ट करें",
+      svc_desc: "अपनी शिकायत दर्ज करने के लिए एक श्रेणी चुनें। हम आपकी चिंताओं को हल करने में मदद करने के लिए यहां हैं।",
+      svc_view_all: "सभी श्रेणियां देखें",
+      svc_file_btn: "शिकायत करें",
+      faq_title: "अक्सर पूछे जाने वाले प्रश्न",
+      faq_desc: "निवारण प्रणाली के संबंध में सामान्य प्रश्नों के त्वरित उत्तर प्राप्त करें।",
+      footer_about: "मुंगेर के लोगों को कुशल, पारदर्शी और नागरिक-केंद्रित नगरपालिका शिकायत निवारण सेवाएं प्रदान करने के लिए समर्पित।",
+      footer_links: "शिकायत सेवाएं",
+      footer_info: "नागरिक जानकारी",
+      footer_nodal: "नोडल अधिकारी",
+      footer_rights: "सर्वाधिकार सुरक्षित।",
+      footer_dev: "द्वारा विकसित",
+      footer_dir: "के निर्देशन में",
+      footer_cont: "योगदानकर्ता",
+      footer_managed: "द्वारा प्रबंधित",
+      svc_list: [
+        { title: "स्वच्छता", desc: "कचरा जमा होने या अनियमित संग्रह की रिपोर्ट करें।", icon: <FiTrash2 /> },
+        { title: "जलापूर्ति", desc: "पानी के रिसाव के संबंध में शिकायत दर्ज करें।", icon: <FiDroplet /> },
+        { title: "स्ट्रीट लाइट्स", desc: "खराब स्ट्रीट लाइट की रिपोर्ट करें।", icon: <FiZap /> },
+        { title: "सड़कें", desc: "गड्ढों या अवैध सड़क मार्ग की रिपोर्ट करें।", icon: <FiMap /> },
+        { title: "अतिक्रमण", desc: "सार्वजनिक भूमि पर अवैध निर्माण की रिपोर्ट करें।", icon: <FiHome /> },
+        { title: "जन स्वास्थ्य", desc: "आवारा पशुओं या स्वास्थ्य खतरों की रिपोर्ट करें।", icon: <FiAlertCircle /> }
+      ]
+    }
+  };
 
-  const grievanceServices = [
-    { title: "Sanitation", desc: "Report garbage pile-up or irregular collection.", icon: <FiTrash2 /> },
-    { title: "Water Supply", desc: "Lodge complaints regarding water leakage.", icon: <FiDroplet /> },
-    { title: "Street Lights", desc: "Report non-functional street lights.", icon: <FiZap /> },
-    { title: "Roads", desc: "Report potholes or illegal road blockage.", icon: <FiMap /> },
-    { title: "Encroachment", desc: "Report illegal construction on public land.", icon: <FiHome /> },
-    { title: "Public Health", desc: "Report stray animals or health hazards.", icon: <FiAlertCircle /> }
+  const content = t[lang];
+
+  const announcements = [
+    { date: "24 Oct 2024", title: lang === 'en' ? "Planned Water Outage for Munger East Wards" : "मुंगेर पूर्वी वार्डों के लिए नियोजित पानी की कटौती", desc: lang === 'en' ? "Maintenance work on the main reservoir will cause a 6-hour outage." : "मुख्य जलाशय पर रखरखाव कार्य के कारण 6 घंटे की कटौती होगी।", category: lang === 'en' ? "Water Dept" : "जल विभाग" },
+    { date: "22 Oct 2024", title: lang === 'en' ? "Clean Munger Green Munger Drive" : "स्वच्छ मुंगेर हरित मुंगेर अभियान", desc: lang === 'en' ? "Join the Nagar Nigam for a community cleaning drive at Munger Fort." : "मुंगेर किले में सामुदायिक सफाई अभियान के लिए नगर निगम से जुड़ें।", category: lang === 'en' ? "Environment" : "पर्यावरण" },
+    { date: "19 Oct 2024", title: lang === 'en' ? "Property Tax Collection Camp in Ward 15" : "वार्ड 15 में संपत्ति कर संग्रह शिविर", desc: lang === 'en' ? "Local camp for property tax collection and assessment." : "संपत्ति कर संग्रह और मूल्यांकन के लिए स्थानीय शिविर।", category: lang === 'en' ? "Finance" : "वित्त" }
   ];
 
   const faqs = [
-    { q: "How can I register a new grievance?", a: "You can register a grievance by clicking on the 'Register Grievance' button in the hero section or by selecting a specific category from the 'Report an Issue' section below." },
-    { q: "What is the expected resolution time?", a: "Most municipal grievances are addressed within 48 to 72 working hours. However, complex issues involving major repairs may take longer, as specified in the Citizen Charter." },
-    { q: "How can I track the status of my complaint?", a: "Enter your unique Complaint ID in the tracking search bar located in the hero section to view real-time updates and officer remarks." },
-    { q: "Is there a mobile app available for Munger Redressal?", a: "Yes, you can download the 'Munger Nigam' mobile app from the Play Store or App Store for easier access on the go." }
+    {
+      q: lang === 'en' ? "How can I register a new grievance?" : "मैं नई शिकायत कैसे दर्ज कर सकता हूँ?",
+      a: lang === 'en' ? "You can register a grievance by clicking on the 'Register Grievance' button in the hero section." : "आप हीरो सेक्शन में 'शिकायत दर्ज करें' बटन पर क्लिक करके शिकायत दर्ज कर सकते हैं।"
+    },
+    {
+      q: lang === 'en' ? "What is the expected resolution time?" : "अपेक्षित समाधान समय क्या है?",
+      a: lang === 'en' ? "Most municipal grievances are addressed within 48 to 72 working hours." : "अधिकांश नगरपालिका शिकायतों का समाधान 48 से 72 कार्य घंटों के भीतर किया जाता है।"
+    }
   ];
 
-  const displayedAnnouncements = showAllAnnouncements ? announcements.slice(0, 10) : announcements.slice(0, 3);
+  const displayedAnnouncements = showAllAnnouncements ? announcements : announcements.slice(0, 3);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Top Bar */}
       <div className="bg-white min-h-[40px] flex justify-between items-center px-4 md:px-6 text-[12px] md:text-[13px] text-gray-700 border-b border-gray-100">
-        <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors font-medium">
+        <div
+          className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors font-medium"
+          onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+        >
           <FiGlobe className="text-gray-500" />
-          <span>English / हिन्दी</span>
+          <span>{content.lang_switch}</span>
           <FiChevronDown className="text-[10px]" />
         </div>
         <div className="flex items-center gap-6">
@@ -110,10 +209,10 @@ export default function Home() {
           </div>
           <div className="hidden sm:block text-left">
             <h1 className="text-lg md:text-[22px] font-serif font-semibold text-[#1e40af] leading-tight tracking-tight ">
-              Nagar Nigam Munger Redressal Portal
+              {content.portal_title}
             </h1>
             <p className="text-[10px] md:text-[13px] text-[#666] font-medium">
-              नगर निगम मुंगेर शिकायत निवारण पोर्टल
+              {content.hindi_subtitle}
             </p>
           </div>
         </div>
@@ -130,7 +229,7 @@ export default function Home() {
           </div>
 
           <button className="hidden md:block px-6 py-2.5 bg-[#1e293b] text-white rounded-lg font-bold hover:bg-slate-800 transition-all shadow-md active:scale-95 text-[13px] uppercase tracking-wider flex items-center gap-2">
-            <FiUser className="text-lg" /> Department Login
+            <FiUser className="text-lg" /> {content.dept_login}
           </button>
 
           {/* Mobile Toggle */}
@@ -151,22 +250,22 @@ export default function Home() {
 
       {/* Desktop Navigation */}
       <nav className="bg-white px-5 py-3.5 hidden md:flex justify-center gap-10 border-b border-gray-100 shadow-sm">
-        <a href="#" className="text-[#1e40af] font-bold relative after:content-[''] after:absolute after:left-0 after:-bottom-[15px] after:w-full after:height-[3px] after:bg-[#1e40af] tracking-wide text-sm">Home</a>
-        <a href="#" className="text-slate-600 font-bold hover:text-[#1e40af] transition-colors tracking-wide text-sm">Grievances</a>
-        <a href="#" className="text-slate-600 font-bold hover:text-[#1e40af] transition-colors tracking-wide text-sm">Announcements</a>
-        <a href="#" className="text-slate-600 font-bold hover:text-[#1e40af] transition-colors tracking-wide text-sm">Services</a>
+        <a href="#" className="text-[#1e40af] font-bold relative after:content-[''] after:absolute after:left-0 after:-bottom-[15px] after:w-full after:height-[3px] after:bg-[#1e40af] tracking-wide text-sm">{content.nav_home}</a>
+        <a href="#" className="text-slate-600 font-bold hover:text-[#1e40af] transition-colors tracking-wide text-sm">{content.nav_grievances}</a>
+        <a href="#" className="text-slate-600 font-bold hover:text-[#1e40af] transition-colors tracking-wide text-sm">{content.nav_announcements}</a>
+        <a href="#" className="text-slate-600 font-bold hover:text-[#1e40af] transition-colors tracking-wide text-sm">{content.nav_services}</a>
       </nav>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50 bg-white pt-20 px-6 flex flex-col gap-6 animate-fade-in overflow-y-auto text-center">
-          <a href="#" className="text-xl font-bold text-primary border-b pb-4">Home</a>
-          <a href="#" className="text-xl font-semibold text-gray-600 border-b pb-4">Grievances</a>
-          <a href="#" className="text-xl font-semibold text-gray-600 border-b pb-4">Announcements</a>
-          <a href="#" className="text-xl font-semibold text-gray-600 border-b pb-4">Services</a>
+          <a href="#" className="text-xl font-bold text-primary border-b pb-4">{content.nav_home}</a>
+          <a href="#" className="text-xl font-semibold text-gray-600 border-b pb-4">{content.nav_grievances}</a>
+          <a href="#" className="text-xl font-semibold text-gray-600 border-b pb-4">{content.nav_announcements}</a>
+          <a href="#" className="text-xl font-semibold text-gray-600 border-b pb-4">{content.nav_services}</a>
           <div className="mt-4 flex flex-col gap-4">
             <button className="w-full py-4 bg-[#1e293b] text-white rounded-xl font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3">
-              <FiUser className="text-xl" /> Department Login
+              <FiUser className="text-xl" /> {content.dept_login}
             </button>
           </div>
         </div>
@@ -198,26 +297,26 @@ export default function Home() {
               />
             </div>
             <div className="leading-tight text-left">
-              <p className="font-bold text-[9px] md:text-[10px] tracking-[0.1em] text-white/90 uppercase">GOVERNMENT OF BIHAR</p>
-              <h3 className="font-black text-xs md:text-[13px] tracking-tight">NAGAR NIGAM MUNGER</h3>
+              <p className="font-bold text-[9px] md:text-[10px] tracking-[0.1em] text-white/90 uppercase">{content.hero_tag}</p>
+              <h3 className="font-black text-xs md:text-[13px] tracking-tight">{content.hero_subtag}</h3>
             </div>
           </div>
 
-          <h2 className="text-4xl md:text-[72px] font-serif font-bold leading-[1.1] md:leading-[1.0] mb-8 tracking-tight drop-shadow-2xl">
-            Nagar Nigam Munger <br className="hidden md:block" />
-            <span className="text-[#facc15]">Redressal Portal</span>
+          <h2 className="text-4xl md:text-[72px] font-serif font-bold leading-[1.2] md:leading-[1.15] mb-8 tracking-tight drop-shadow-2xl">
+            {content.hero_title} <br className="hidden md:block" />
+            <span className="text-[#facc15]">{content.hero_accent}</span>
           </h2>
 
           <p className="text-lg md:text-[22px] leading-relaxed text-white/90 mb-10 md:mb-12 max-w-[800px] font-medium drop-shadow-md">
-            A unified digital gateway for citizens of Munger to report, monitor, and resolve urban municipal issues. Committed to transparent, accountable, and responsive governance.
+            {content.hero_desc}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 mb-12 md:mb-16 w-full justify-center">
             <button className="px-8 md:px-12 py-3.5 bg-[#1e40af] text-white rounded-md text-base md:text-[16px] font-bold hover:bg-blue-700 transition-all shadow-lg active:scale-95 flex items-center justify-center gap-3 uppercase tracking-wide">
-              <FiUser className="text-lg" /> Register Grievance
+              <TfiWrite className="text-lg" /> {content.hero_btn_reg}
             </button>
             <button className="px-8 md:px-12 py-3.5 bg-transparent border-2 border-white text-white rounded-md text-base md:text-[16px] font-bold hover:bg-white hover:text-gray-900 transition-all active:scale-95 flex items-center justify-center gap-3 uppercase tracking-wide">
-              <FiUser className="text-lg" /> Citizen Login
+              <FiUser className="text-lg" /> {content.hero_btn_login}
             </button>
           </div>
 
@@ -227,12 +326,12 @@ export default function Home() {
               <FiSearch className="text-gray-400 mr-4 text-xl md:text-2xl" />
               <input
                 type="text"
-                placeholder="Enter your Complaint ID to track status..."
+                placeholder={content.hero_track_placeholder}
                 className="w-full py-6 md:py-8 text-gray-900 outline-none text-lg md:text-2xl font-semibold placeholder:text-gray-400"
               />
             </div>
             <button className="bg-[#059669] text-white px-10 md:px-16 py-6 md:py-8 text-lg md:text-[22px] font-black hover:bg-[#047857] transition-all flex items-center justify-center gap-3 active:bg-[#064e3b] uppercase tracking-widest">
-              Track Status
+              {content.hero_track_btn}
             </button>
           </div>
         </div>
@@ -243,15 +342,15 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto">
           <div className="flex items-center gap-3 mb-10 text-[#1e40af]">
             <HiMegaphone className="text-2xl" />
-            <h2 className="text-2xl font-bold tracking-tight">Official Announcements</h2>
+            <h2 className="text-2xl font-bold tracking-tight">{content.ann_title}</h2>
           </div>
 
           <div className={`w-full border border-gray-200 rounded-xl bg-white transition-all duration-300 ${showAllAnnouncements ? 'h-[450px] overflow-y-auto' : 'h-auto'}`}>
             <div className="hidden md:flex bg-slate-50 border-b border-gray-100 text-[13px] font-bold text-slate-500 uppercase tracking-wider sticky top-0 z-10">
-              <div className="py-4 px-6 w-[180px]">Date</div>
-              <div className="py-4 px-6 flex-1">Announcement Details</div>
-              <div className="py-4 px-6 w-[180px]">Category</div>
-              <div className="py-4 px-6 w-[150px] text-right">Action</div>
+              <div className="py-4 px-6 w-[180px]">{content.ann_date}</div>
+              <div className="py-4 px-6 flex-1">{content.ann_details}</div>
+              <div className="py-4 px-6 w-[180px]">{content.ann_cat}</div>
+              <div className="py-4 px-6 w-[150px] text-right">{content.ann_action}</div>
             </div>
 
             <div className="divide-y divide-gray-100">
@@ -273,7 +372,7 @@ export default function Home() {
                   </div>
                   <div className="w-full md:w-[150px] mt-4 md:mt-0 text-right">
                     <button className="text-[#1e40af] font-bold text-[14px] hover:underline inline-flex items-center gap-1">
-                      View Details <FiArrowRight className="text-xs" />
+                      {content.ann_view_details} <FiArrowRight className="text-xs" />
                     </button>
                   </div>
                 </div>
@@ -283,10 +382,10 @@ export default function Home() {
 
           <div className="mt-8 flex justify-end gap-6">
             {showAllAnnouncements ? (
-              <button onClick={() => setShowAllAnnouncements(false)} className="text-slate-400 font-bold text-[14px] hover:text-primary transition-colors">Show Less</button>
+              <button onClick={() => setShowAllAnnouncements(false)} className="text-slate-400 font-bold text-[14px] hover:text-primary transition-colors">{content.ann_show_less}</button>
             ) : (
               <button onClick={() => setShowAllAnnouncements(true)} className="flex items-center gap-2 text-[#1e40af] font-bold text-[14px] hover:underline">
-                View All Announcements <FiExternalLink className="text-sm" />
+                {content.ann_view_all} <FiExternalLink className="text-sm" />
               </button>
             )}
           </div>
@@ -298,16 +397,16 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
             <div className="text-left">
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-800 mb-2 tracking-tight">Report an Issue</h2>
-              <p className="text-slate-500 text-base">Select a category to lodge your grievance.</p>
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-slate-800 mb-2 tracking-tight">{content.svc_title}</h2>
+              <p className="text-slate-500 text-base">{content.svc_desc}</p>
             </div>
             <button className="text-primary font-bold text-sm flex items-center gap-2 hover:underline">
-              View All Categories <FiArrowRight />
+              {content.svc_view_all} <FiArrowRight />
             </button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-            {grievanceServices.map((service, idx) => (
+            {content.svc_list.map((service, idx) => (
               <div key={idx} className="group p-5 border border-gray-100 rounded-xl hover:border-primary/40 transition-all duration-300 text-center bg-white">
                 <div className="text-3xl text-primary mb-4 group-hover:scale-110 transition-transform inline-block">
                   {service.icon}
@@ -322,8 +421,8 @@ export default function Home() {
       {/* FAQ Section */}
       <section className="py-16 md:py-24 bg-white px-4 md:px-14">
         <div className="max-w-[800px] mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-800 mb-4 tracking-tight">Frequently Asked Questions</h2>
-          <p className="text-slate-500 text-lg mb-12">Find quick answers to common queries regarding our redressal system.</p>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-800 mb-4 tracking-tight">{content.faq_title}</h2>
+          <p className="text-slate-500 text-lg mb-12">{content.faq_desc}</p>
 
           <div className="space-y-4 text-left">
             {faqs.map((faq, idx) => (
@@ -348,22 +447,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Associated Initiatives */}
-      <section className="py-16 bg-[#f8fafc] border-y border-gray-100 px-4 md:px-14">
-        <div className="max-w-[1280px] mx-auto">
-          <h4 className="text-center text-[#94a3b8] tracking-[0.4em] font-black text-[11px] uppercase mb-12">
-            ASSOCIATED INITIATIVES
-          </h4>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="Digital India" fill className="object-contain" /></div>
-            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="MyGov" fill className="object-contain" /></div>
-            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="NIC" fill className="object-contain" /></div>
-            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="Bihar Portal" fill className="object-contain" /></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer - Optimized for Grievance Redressal */}
+      {/* Footer */}
       <footer className="bg-[#0f172a] text-slate-300 pt-20 pb-10 px-4 md:px-14">
         <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-24 mb-20">
           {/* Brand Col */}
@@ -375,7 +459,7 @@ export default function Home() {
               <h5 className="text-white font-bold text-xl leading-tight">Nagar Nigam<br />Munger</h5>
             </div>
             <p className="text-slate-400 text-[15px] leading-relaxed mb-8">
-              Dedicated to providing efficient, transparent, and citizen-centric municipal grievance redressal services to the people of Munger.
+              {content.footer_about}
             </p>
             <div className="flex gap-5 text-xl">
               <a href="#" className="hover:text-white transition-all"><FiFacebook /></a>
@@ -385,33 +469,30 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Links Col 1: Grievance Services */}
+          {/* Links Col 1 */}
           <div className="flex flex-col items-start text-left">
-            <h6 className="text-white font-bold uppercase tracking-widest text-xs mb-8 border-l-2 border-primary pl-4">Grievance Services</h6>
+            <h6 className="text-white font-bold uppercase tracking-widest text-xs mb-8 border-l-2 border-primary pl-4">{content.footer_links}</h6>
             <ul className="space-y-4 text-[14px]">
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiPlus className="text-primary" /> Lodge a Complaint</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiSearch className="text-primary" /> Track Status</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiRefreshCw className="text-primary" /> Re-open Grievance</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiMessageSquare className="text-primary" /> Give Feedback</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiPhone className="text-primary" /> Helpline Numbers</a></li>
+              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiPlus className="text-primary" /> {lang === 'en' ? 'Lodge a Complaint' : 'शिकायत दर्ज करें'}</a></li>
+              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiSearch className="text-primary" /> {lang === 'en' ? 'Track Status' : 'स्थिति ट्रैक करें'}</a></li>
+              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiRefreshCw className="text-primary" /> {lang === 'en' ? 'Re-open Grievance' : 'शिकायत फिर से खोलें'}</a></li>
+              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiMessageSquare className="text-primary" /> {lang === 'en' ? 'Give Feedback' : 'प्रतिक्रिया दें'}</a></li>
             </ul>
           </div>
 
-          {/* Links Col 2: Citizen Info */}
+          {/* Links Col 2 */}
           <div className="flex flex-col items-start text-left">
-            <h6 className="text-white font-bold uppercase tracking-widest text-xs mb-8 border-l-2 border-primary pl-4">Citizen Information</h6>
+            <h6 className="text-white font-bold uppercase tracking-widest text-xs mb-8 border-l-2 border-primary pl-4">{content.footer_info}</h6>
             <ul className="space-y-4 text-[14px]">
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiFileText className="text-primary" /> Citizen Charter</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiCheckCircle className="text-primary" /> Resolution Timeline</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiHelpCircle className="text-primary" /> How it Works?</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiExternalLink className="text-primary" /> Rules & Regulations</a></li>
-              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiGlobe className="text-primary" /> FAQs</a></li>
+              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiFileText className="text-primary" /> {lang === 'en' ? 'Citizen Charter' : 'नागरिक अधिकार पत्र'}</a></li>
+              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiCheckCircle className="text-primary" /> {lang === 'en' ? 'Resolution Timeline' : 'समाधान समय सीमा'}</a></li>
+              <li><a href="#" className="hover:text-white hover:translate-x-1 inline-block transition-all flex items-center gap-2"><FiHelpCircle className="text-primary" /> {lang === 'en' ? 'How it Works?' : 'यह कैसे काम करता है?'}</a></li>
             </ul>
           </div>
 
           {/* Contact Col */}
           <div className="flex flex-col items-start text-left">
-            <h6 className="text-white font-bold uppercase tracking-widest text-xs mb-8 border-l-2 border-primary pl-4">Nodal Officers</h6>
+            <h6 className="text-white font-bold uppercase tracking-widest text-xs mb-8 border-l-2 border-primary pl-4">{content.footer_nodal}</h6>
             <div className="space-y-6 text-[14px]">
               <div className="flex gap-4 items-start">
                 <FiMapPin className="mt-1 text-primary shrink-0" />
@@ -421,10 +502,6 @@ export default function Home() {
                 <FiPhone className="text-primary shrink-0" />
                 <span className="text-slate-400">Toll Free: 1800-XXX-XXXX</span>
               </div>
-              <div className="flex gap-4 items-center">
-                <FiMail className="text-primary shrink-0" />
-                <span className="text-slate-400">grievance@mungernigam.in</span>
-              </div>
             </div>
           </div>
         </div>
@@ -432,25 +509,19 @@ export default function Home() {
         {/* Footer Bottom Bar */}
         <div className="border-t border-slate-800/50 pt-10">
           <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[13px] text-slate-500">
-            <p>&copy; 2024 Nagar Nigam Munger. All rights reserved.</p>
-            <div className="flex gap-8">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Hyperlinking Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Copyright Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Disclaimer</a>
-            </div>
+            <p>&copy; 2024 Nagar Nigam Munger. {content.footer_rights}</p>
             <div className="flex flex-col items-center md:items-end gap-1.5 text-center md:text-right">
               <p className="text-[13px] text-slate-400">
-                Developed by <span className="text-slate-200 font-bold">Government Engineering College Munger</span>
+                {content.footer_dev} <span className="text-slate-200 font-bold">Government Engineering College Munger</span>
               </p>
               <p className="text-[11px] text-slate-500">
-                Under the direction of <span className="text-slate-400 font-semibold">Govind Kumar Jha</span> & <span className="text-slate-400 font-semibold">Dr. Saurabh Suman</span>
+                {content.footer_dir} <span className="text-slate-400 font-semibold">Govind Kumar Jha</span> & <span className="text-slate-400 font-semibold">Dr. Saurabh Suman</span>
               </p>
               <p className="text-[10px] text-slate-600 max-w-[450px]">
-                Contributors: Md Farhan, Ashwin Mathur, Harsh Kumar, Layaque Noor, Piyush Ranjan, Sourabh, Subham, Manish Kumar
+                {content.footer_cont}: Md Farhan, Ashwin Mathur, Harsh Kumar, Layaque Noor, Piyush Ranjan, Sourabh, Subham, Manish Kumar
               </p>
               <p className="text-[12px] text-slate-500 mt-1">
-                Managed by <span className="text-slate-300 font-semibold">NIC Bihar</span>
+                {content.footer_managed} <span className="text-slate-300 font-semibold">NIC Bihar</span>
               </p>
             </div>
           </div>
