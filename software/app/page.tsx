@@ -2,48 +2,100 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import {
-  FiGlobe,
-  FiChevronDown,
-  FiMail,
-  FiShare2,
-  FiBell,
-  FiHelpCircle,
-  FiUser,
-  FiSearch,
-  FiMenu,
-  FiX,
-  FiArrowRight,
-  FiExternalLink,
-  FiPhone,
-  FiMapPin,
-  FiFacebook,
-  FiTwitter,
-  FiYoutube,
-  FiInstagram,
-  FiDroplet,
-  FiHome,
-  FiTrash2,
-  FiMap,
-  FiAlertCircle,
-  FiZap,
-  FiPlus,
+import { 
+  FiGlobe, 
+  FiChevronDown, 
+  FiMail, 
+  FiShare2, 
+  FiBell, 
+  FiHelpCircle, 
+  FiUser, 
+  FiSearch, 
+  FiMenu, 
+  FiX, 
+  FiArrowRight, 
+  FiExternalLink, 
+  FiPhone, 
+  FiMapPin, 
+  FiFacebook, 
+  FiTwitter, 
+  FiYoutube, 
+  FiInstagram, 
+  FiDroplet, 
+  FiHome, 
+  FiTrash2, 
+  FiMap, 
+  FiAlertCircle, 
+  FiZap, 
+  FiPlus, 
   FiMinus,
   FiFileText,
   FiCheckCircle,
   FiRefreshCw,
-  FiMessageSquare
+  FiMessageSquare,
+  FiClock,
+  FiUserCheck,
+  FiActivity
 } from "react-icons/fi";
 import { HiMegaphone } from "react-icons/hi2";
 import { TfiWrite } from "react-icons/tfi";
 
 type Language = 'en' | 'hi';
 
+interface Complaint {
+  grievance_code: string;
+  title: string;
+  description: string;
+  current_status: 'Pending' | 'Acknowledged' | 'In Progress' | 'Resolved' | 'Closed';
+  priority: 'Low' | 'Medium' | 'High';
+  submitted_at: string;
+  citizen_address: string;
+  issue_type: string;
+  ward: string;
+  updates: { status: string; date: string; remark: string }[];
+}
+
 export default function Home() {
   const [lang, setLang] = useState<Language>('en');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  
+  // Tracker State
+  const [trackInput, setTrackInput] = useState("");
+  const [searchedComplaint, setSearchedComplaint] = useState<Complaint | null>(null);
+  const [searchError, setSearchError] = useState(false);
+
+  const demoComplaint: Complaint = {
+    grievance_code: "MUN-2024-885",
+    title: "Continuous Water Leakage in Main Pipe",
+    description: "There is a major leakage in the main water supply pipe near Munger Fort. Large amount of water is being wasted since morning.",
+    current_status: "In Progress",
+    priority: "High",
+    submitted_at: "12 May 2024, 10:30 AM",
+    citizen_address: "Ward 12, Fort Road Area, Munger",
+    issue_type: "Water Supply",
+    ward: "Ward No. 12",
+    updates: [
+      { status: "Submitted", date: "12 May 2024, 10:30 AM", remark: "Grievance successfully registered." },
+      { status: "Acknowledged", date: "12 May 2024, 02:15 PM", remark: "Assigned to Public Works Department." },
+      { status: "In Progress", date: "13 May 2024, 09:00 AM", remark: "Repair team has reached the site and excavation started." }
+    ]
+  };
+
+  const handleTrack = () => {
+    if (trackInput.toUpperCase() === demoComplaint.grievance_code) {
+      setSearchedComplaint(demoComplaint);
+      setSearchError(false);
+      // Scroll to result
+      setTimeout(() => {
+        document.getElementById('tracking-result')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      setSearchedComplaint(null);
+      setSearchError(true);
+    }
+  };
 
   const t = {
     en: {
@@ -62,7 +114,7 @@ export default function Home() {
       hero_desc: "A unified digital gateway for citizens of Munger to report, monitor, and resolve urban municipal issues. Committed to transparent, accountable, and responsive governance.",
       hero_btn_reg: "Register Grievance",
       hero_btn_login: "Citizen Login",
-      hero_track_placeholder: "Enter your Complaint ID to track status...",
+      hero_track_placeholder: "Enter ID (Try: MUN-2024-885)",
       hero_track_btn: "Track Status",
       ann_title: "Official Announcements",
       ann_date: "Date",
@@ -112,7 +164,7 @@ export default function Home() {
       hero_desc: "मुंगेर के नागरिकों के लिए शहरी नगर पालिका मुद्दों की रिपोर्ट करने, निगरानी करने और समाधान करने के लिए एक एकीकृत डिजिटल गेटवे। पारदर्शी, जवाबदेह और उत्तरदायी शासन के लिए प्रतिबद्ध।",
       hero_btn_reg: "शिकायत दर्ज करें",
       hero_btn_login: "नागरिक लॉगिन",
-      hero_track_placeholder: "स्थिति ट्रैक करने के लिए शिकायत आईडी दर्ज करें...",
+      hero_track_placeholder: "ID दर्ज करें (कोशिश करें: MUN-2024-885)",
       hero_track_btn: "स्थिति देखें",
       ann_title: "आधिकारिक घोषणाएं",
       ann_date: "दिनांक",
@@ -150,30 +202,30 @@ export default function Home() {
 
   const content = t[lang];
 
-  const announcements = [
+  const announcementsData = [
     { date: "24 Oct 2024", title: lang === 'en' ? "Planned Water Outage for Munger East Wards" : "मुंगेर पूर्वी वार्डों के लिए नियोजित पानी की कटौती", desc: lang === 'en' ? "Maintenance work on the main reservoir will cause a 6-hour outage." : "मुख्य जलाशय पर रखरखाव कार्य के कारण 6 घंटे की कटौती होगी।", category: lang === 'en' ? "Water Dept" : "जल विभाग" },
     { date: "22 Oct 2024", title: lang === 'en' ? "Clean Munger Green Munger Drive" : "स्वच्छ मुंगेर हरित मुंगेर अभियान", desc: lang === 'en' ? "Join the Nagar Nigam for a community cleaning drive at Munger Fort." : "मुंगेर किले में सामुदायिक सफाई अभियान के लिए नगर निगम से जुड़ें।", category: lang === 'en' ? "Environment" : "पर्यावरण" },
     { date: "19 Oct 2024", title: lang === 'en' ? "Property Tax Collection Camp in Ward 15" : "वार्ड 15 में संपत्ति कर संग्रह शिविर", desc: lang === 'en' ? "Local camp for property tax collection and assessment." : "संपत्ति कर संग्रह और मूल्यांकन के लिए स्थानीय शिविर।", category: lang === 'en' ? "Finance" : "वित्त" }
   ];
 
-  const faqs = [
-    {
-      q: lang === 'en' ? "How can I register a new grievance?" : "मैं नई शिकायत कैसे दर्ज कर सकता हूँ?",
-      a: lang === 'en' ? "You can register a grievance by clicking on the 'Register Grievance' button in the hero section." : "आप हीरो सेक्शन में 'शिकायत दर्ज करें' बटन पर क्लिक करके शिकायत दर्ज कर सकते हैं।"
+  const faqsData = [
+    { 
+      q: lang === 'en' ? "How can I register a new grievance?" : "मैं नई शिकायत कैसे दर्ज कर सकता हूँ?", 
+      a: lang === 'en' ? "You can register a grievance by clicking on the 'Register Grievance' button in the hero section." : "आप हीरो सेक्शन में 'शिकायत दर्ज करें' बटन पर क्लिक करके शिकायत दर्ज कर सकते हैं।" 
     },
-    {
-      q: lang === 'en' ? "What is the expected resolution time?" : "अपेक्षित समाधान समय क्या है?",
-      a: lang === 'en' ? "Most municipal grievances are addressed within 48 to 72 working hours." : "अधिकांश नगरपालिका शिकायतों का समाधान 48 से 72 कार्य घंटों के भीतर किया जाता है।"
+    { 
+      q: lang === 'en' ? "What is the expected resolution time?" : "अपेक्षित समाधान समय क्या है?", 
+      a: lang === 'en' ? "Most municipal grievances are addressed within 48 to 72 working hours." : "अधिकांश नगरपालिका शिकायतों का समाधान 48 से 72 कार्य घंटों के भीतर किया जाता है।" 
     }
   ];
 
-  const displayedAnnouncements = showAllAnnouncements ? announcements : announcements.slice(0, 3);
+  const displayedAnnouncements = showAllAnnouncements ? announcementsData : announcementsData.slice(0, 3);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Top Bar */}
       <div className="bg-white min-h-[40px] flex justify-between items-center px-4 md:px-6 text-[12px] md:text-[13px] text-gray-700 border-b border-gray-100">
-        <div
+        <div 
           className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors font-medium"
           onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
         >
@@ -200,9 +252,9 @@ export default function Home() {
       <header className="bg-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center sticky top-0 z-[60]">
         <div className="flex items-center gap-3 md:gap-4">
           <div className="relative w-[45px] h-[45px] md:w-[58px] md:h-[58px]">
-            <Image
-              src="/logo_munger.png"
-              alt="Munger Logo"
+            <Image 
+              src="/logo_munger.png" 
+              alt="Munger Logo" 
               fill
               className="object-contain"
             />
@@ -216,7 +268,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-
+        
         <div className="flex items-center gap-4 md:gap-8">
           <div className="hidden md:flex gap-6 text-[24px] text-gray-400">
             <button className="hover:text-primary transition-colors cursor-pointer relative">
@@ -227,13 +279,13 @@ export default function Home() {
               <FiHelpCircle />
             </button>
           </div>
-
+          
           <button className="hidden md:block px-6 py-2.5 bg-[#1e293b] text-white rounded-lg font-bold hover:bg-slate-800 transition-all shadow-md active:scale-95 text-[13px] uppercase tracking-wider flex items-center gap-2">
             <FiUser className="text-lg" /> {content.dept_login}
           </button>
 
           {/* Mobile Toggle */}
-          <button
+          <button 
             className="md:hidden text-2xl text-gray-600 p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
@@ -275,9 +327,9 @@ export default function Home() {
       <section className="relative min-h-[500px] md:min-h-[600px] w-full overflow-hidden flex items-center justify-center">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/munger_hero1.png"
-            alt="Munger Hero"
+          <Image 
+            src="/munger_hero1.png" 
+            alt="Munger Hero" 
             fill
             className="object-cover"
             priority
@@ -289,9 +341,9 @@ export default function Home() {
         <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 md:px-14 py-16 md:py-24 text-white animate-fade-in flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-3 md:gap-4 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl mb-8 md:mb-10 border border-white/20 shadow-xl">
             <div className="w-10 h-10 md:w-11 md:h-11 relative rounded-lg overflow-hidden">
-              <Image
-                src="/logo_indian_gov.png"
-                alt="Bihar Govt"
+              <Image 
+                src="/logo_indian_gov.png" 
+                alt="Bihar Govt" 
                 fill
                 className="object-contain"
               />
@@ -306,7 +358,7 @@ export default function Home() {
             {content.hero_title} <br className="hidden md:block" />
             <span className="text-[#facc15]">{content.hero_accent}</span>
           </h2>
-
+          
           <p className="text-lg md:text-[22px] leading-relaxed text-white/90 mb-10 md:mb-12 max-w-[800px] font-medium drop-shadow-md">
             {content.hero_desc}
           </p>
@@ -324,18 +376,99 @@ export default function Home() {
           <div className="flex flex-col md:flex-row bg-white rounded-lg overflow-hidden shadow-2xl w-full max-w-[800px] group transition-all">
             <div className="flex-1 flex items-center px-6 md:px-10 bg-white">
               <FiSearch className="text-gray-400 mr-4 text-xl md:text-2xl" />
-              <input
-                type="text"
+              <input 
+                type="text" 
+                value={trackInput}
+                onChange={(e) => setTrackInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleTrack()}
                 placeholder={content.hero_track_placeholder}
                 className="w-full py-6 md:py-8 text-gray-900 outline-none text-lg md:text-2xl font-semibold placeholder:text-gray-400"
               />
             </div>
-            <button className="bg-[#059669] text-white px-10 md:px-16 py-6 md:py-8 text-lg md:text-[22px] font-black hover:bg-[#047857] transition-all flex items-center justify-center gap-3 active:bg-[#064e3b] uppercase tracking-widest">
+            <button 
+              onClick={handleTrack}
+              className="bg-[#059669] text-white px-10 md:px-16 py-6 md:py-8 text-lg md:text-[22px] font-black hover:bg-[#047857] transition-all flex items-center justify-center gap-3 active:bg-[#064e3b] uppercase tracking-widest"
+            >
               {content.hero_track_btn}
             </button>
           </div>
+          {searchError && <p className="mt-4 text-red-400 font-bold animate-bounce bg-white/10 px-4 py-1 rounded-full backdrop-blur-sm border border-red-400/30">Invalid Complaint ID. Please try MUN-2024-885</p>}
         </div>
       </section>
+
+      {/* Tracking Result Section - Ultra Simple & Mobile Optimized */}
+      {searchedComplaint && (
+        <section id="tracking-result" className="py-10 bg-white px-4 md:px-14 border-b border-gray-100 scroll-mt-24 animate-fade-in">
+          <div className="max-w-[800px] mx-auto">
+            <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+              <h3 className="text-lg font-serif font-bold text-slate-800 flex items-center gap-2">
+                <FiCheckCircle className="text-green-600" /> Complaint Status
+              </h3>
+              <button 
+                onClick={() => setSearchedComplaint(null)}
+                className="text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 text-[12px] font-bold uppercase tracking-wider"
+              >
+                <FiX /> Close
+              </button>
+            </div>
+
+            {/* Simple Grid Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-x-12 mb-8">
+              <div className="flex flex-col gap-1">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Complaint ID</span>
+                <span className="text-[14px] font-black text-slate-800">{searchedComplaint.grievance_code}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Current Status</span>
+                <span className="text-[13px] font-bold text-blue-600 flex items-center gap-1.5 uppercase">
+                  <FiActivity className="text-[10px]" /> {searchedComplaint.current_status}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1 md:col-span-2 border-t border-gray-50 pt-4">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Subject</span>
+                <span className="text-[13px] font-bold text-slate-700 leading-tight">{searchedComplaint.title}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Priority</span>
+                <span className="text-[13px] font-bold text-slate-600">{searchedComplaint.priority}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Submitted On</span>
+                <span className="text-[13px] font-bold text-slate-600">{searchedComplaint.submitted_at}</span>
+              </div>
+              <div className="flex flex-col gap-1 md:col-span-2">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Location</span>
+                <span className="text-[13px] font-bold text-slate-600">{searchedComplaint.citizen_address} ({searchedComplaint.ward})</span>
+              </div>
+            </div>
+
+            {/* Minimal History */}
+            <div className="bg-slate-50/50 rounded-lg p-5 border border-slate-100">
+              <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-5 border-b border-slate-200 pb-2">Status Timeline</h4>
+              <div className="space-y-4">
+                {searchedComplaint.updates.map((update, idx) => (
+                  <div key={idx} className="flex gap-4">
+                    <div className="text-[11px] font-bold text-slate-400 w-24 shrink-0 pt-0.5">{update.date.split(',')[0]}</div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[12px] font-black text-slate-700">{update.status}</span>
+                      <span className="text-[12px] text-slate-500 leading-relaxed">{update.remark}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <button className="flex-1 bg-white border border-slate-200 py-2.5 rounded text-slate-600 font-bold text-[12px] uppercase tracking-wider hover:bg-slate-50 transition-all">
+                Download PDF
+              </button>
+              <button className="flex-1 bg-blue-600 text-white py-2.5 rounded font-bold text-[12px] uppercase tracking-wider hover:bg-blue-700 transition-all">
+                Print Receipt
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Announcements Section */}
       <section className="py-16 md:py-20 bg-slate-50/50 px-4 md:px-14">
@@ -404,7 +537,7 @@ export default function Home() {
               {content.svc_view_all} <FiArrowRight />
             </button>
           </div>
-
+          
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {content.svc_list.map((service, idx) => (
               <div key={idx} className="group p-5 border border-gray-100 rounded-xl hover:border-primary/40 transition-all duration-300 text-center bg-white">
@@ -423,11 +556,11 @@ export default function Home() {
         <div className="max-w-[800px] mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-800 mb-4 tracking-tight">{content.faq_title}</h2>
           <p className="text-slate-500 text-lg mb-12">{content.faq_desc}</p>
-
+          
           <div className="space-y-4 text-left">
-            {faqs.map((faq, idx) => (
+            {faqsData.map((faq, idx) => (
               <div key={idx} className="border border-gray-100 rounded-xl overflow-hidden">
-                <button
+                <button 
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                   className="w-full p-5 md:p-6 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors text-left"
                 >
@@ -443,6 +576,21 @@ export default function Home() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Associated Initiatives */}
+      <section className="py-16 bg-[#f8fafc] border-y border-gray-100 px-4 md:px-14">
+        <div className="max-w-[1280px] mx-auto">
+          <h4 className="text-center text-[#94a3b8] tracking-[0.4em] font-black text-[11px] uppercase mb-12">
+            ASSOCIATED INITIATIVES
+          </h4>
+          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="Digital India" fill className="object-contain" /></div>
+            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="MyGov" fill className="object-contain" /></div>
+            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="NIC" fill className="object-contain" /></div>
+            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="Bihar Portal" fill className="object-contain" /></div>
           </div>
         </div>
       </section>
