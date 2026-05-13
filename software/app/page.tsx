@@ -1,33 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { 
-  FiGlobe, 
-  FiChevronDown, 
-  FiMail, 
-  FiShare2, 
-  FiBell, 
-  FiHelpCircle, 
-  FiUser, 
-  FiSearch, 
-  FiMenu, 
-  FiX, 
-  FiArrowRight, 
-  FiExternalLink, 
-  FiPhone, 
-  FiMapPin, 
-  FiFacebook, 
-  FiTwitter, 
-  FiYoutube, 
-  FiInstagram, 
-  FiDroplet, 
-  FiHome, 
-  FiTrash2, 
-  FiMap, 
-  FiAlertCircle, 
-  FiZap, 
-  FiPlus, 
+import { useState, useEffect } from "react";
+import {
+  FiGlobe,
+  FiChevronDown,
+  FiMail,
+  FiShare2,
+  FiBell,
+  FiHelpCircle,
+  FiUser,
+  FiSearch,
+  FiMenu,
+  FiX,
+  FiArrowRight,
+  FiExternalLink,
+  FiPhone,
+  FiMapPin,
+  FiFacebook,
+  FiTwitter,
+  FiYoutube,
+  FiInstagram,
+  FiDroplet,
+  FiHome,
+  FiTrash2,
+  FiMap,
+  FiAlertCircle,
+  FiZap,
+  FiPlus,
   FiMinus,
   FiFileText,
   FiCheckCircle,
@@ -35,7 +35,8 @@ import {
   FiMessageSquare,
   FiClock,
   FiUserCheck,
-  FiActivity
+  FiActivity,
+  FiShield
 } from "react-icons/fi";
 import { HiMegaphone } from "react-icons/hi2";
 import { TfiWrite } from "react-icons/tfi";
@@ -60,7 +61,8 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  
+  const [showLanguagePopup, setShowLanguagePopup] = useState(true);
+
   // Tracker State
   const [trackInput, setTrackInput] = useState("");
   const [searchedComplaint, setSearchedComplaint] = useState<Complaint | null>(null);
@@ -87,7 +89,6 @@ export default function Home() {
     if (trackInput.toUpperCase() === demoComplaint.grievance_code) {
       setSearchedComplaint(demoComplaint);
       setSearchError(false);
-      // Scroll to result
       setTimeout(() => {
         document.getElementById('tracking-result')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -95,6 +96,11 @@ export default function Home() {
       setSearchedComplaint(null);
       setSearchError(true);
     }
+  };
+
+  const selectLanguage = (selectedLang: Language) => {
+    setLang(selectedLang);
+    setShowLanguagePopup(false);
   };
 
   const t = {
@@ -209,13 +215,13 @@ export default function Home() {
   ];
 
   const faqsData = [
-    { 
-      q: lang === 'en' ? "How can I register a new grievance?" : "मैं नई शिकायत कैसे दर्ज कर सकता हूँ?", 
-      a: lang === 'en' ? "You can register a grievance by clicking on the 'Register Grievance' button in the hero section." : "आप हीरो सेक्शन में 'शिकायत दर्ज करें' बटन पर क्लिक करके शिकायत दर्ज कर सकते हैं।" 
+    {
+      q: lang === 'en' ? "How can I register a new grievance?" : "मैं नई शिकायत कैसे दर्ज कर सकता हूँ?",
+      a: lang === 'en' ? "You can register a grievance by clicking on the 'Register Grievance' button in the hero section." : "आप हीरो सेक्शन में 'शिकायत दर्ज करें' बटन पर क्लिक करके शिकायत दर्ज कर सकते हैं।"
     },
-    { 
-      q: lang === 'en' ? "What is the expected resolution time?" : "अपेक्षित समाधान समय क्या है?", 
-      a: lang === 'en' ? "Most municipal grievances are addressed within 48 to 72 working hours." : "अधिकांश नगरपालिका शिकायतों का समाधान 48 से 72 कार्य घंटों के भीतर किया जाता है।" 
+    {
+      q: lang === 'en' ? "What is the expected resolution time?" : "अपेक्षित समाधान समय क्या है?",
+      a: lang === 'en' ? "Most municipal grievances are addressed within 48 to 72 working hours." : "अधिकांश नगरपालिका शिकायतों का समाधान 48 से 72 कार्य घंटों के भीतर किया जाता है।"
     }
   ];
 
@@ -223,9 +229,63 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      {/* Language Selection Popup - Simple & Shadow-free */}
+      {showLanguagePopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px] animate-fade-in"></div>
+
+          {/* Modal */}
+          <div className="relative bg-white w-full max-w-[420px] rounded-xl overflow-hidden animate-slide-up border border-slate-200 p-5 md:p-7 text-center">
+            {/* Top Icon - Using User Provided Image */}
+            <div className="flex justify-center mb-5">
+              <div className="relative w-16 h-16">
+                <Image
+                  src="/language_popup_icon.png"
+                  alt="Language Icon"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
+
+            <h2 className="text-lg md:text-xl font-black text-slate-800 mb-0.5">Choose Your Language</h2>
+            <h2 className="text-base md:text-lg font-bold text-[#1e40af] mb-2">अपनी भाषा चुनें</h2>
+            <p className="text-slate-500 text-[12px] mb-6 font-medium">Select your preferred language to continue / जारी रखने के लिए अपनी पसंदीदा भाषा चुनें</p>
+
+            {/* Divider */}
+            <div className="w-full h-[1px] bg-slate-100 mb-6"></div>
+
+            {/* Selection Buttons - Flat & Reduced Padding */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <button
+                onClick={() => selectLanguage('en')}
+                className="group flex flex-col items-center justify-center gap-1 p-4 border border-slate-200 rounded-lg hover:border-blue-600 hover:bg-blue-50/50 transition-all active:scale-95"
+              >
+                <span className="text-lg font-black text-blue-600">EN</span>
+                <span className="text-[12px] font-bold text-slate-600">English</span>
+              </button>
+              <button
+                onClick={() => selectLanguage('hi')}
+                className="group flex flex-col items-center justify-center gap-1 p-4 border border-slate-200 rounded-lg hover:border-[#16a34a] hover:bg-green-50/50 transition-all active:scale-95"
+              >
+                <span className="text-lg font-black text-[#16a34a]">हिं</span>
+                <span className="text-[12px] font-bold text-slate-600">हिंदी</span>
+              </button>
+            </div>
+
+            {/* Footer Info */}
+            <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+              <FiGlobe className="text-[12px]" />
+              <p>Change anytime from top menu</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Bar */}
       <div className="bg-white min-h-[40px] flex justify-between items-center px-4 md:px-6 text-[12px] md:text-[13px] text-gray-700 border-b border-gray-100">
-        <div 
+        <div
           className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors font-medium"
           onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
         >
@@ -252,9 +312,9 @@ export default function Home() {
       <header className="bg-white px-4 md:px-6 py-3 md:py-4 flex justify-between items-center sticky top-0 z-[60]">
         <div className="flex items-center gap-3 md:gap-4">
           <div className="relative w-[45px] h-[45px] md:w-[58px] md:h-[58px]">
-            <Image 
-              src="/logo_munger.png" 
-              alt="Munger Logo" 
+            <Image
+              src="/logo_munger.png"
+              alt="Munger Logo"
               fill
               className="object-contain"
             />
@@ -268,7 +328,7 @@ export default function Home() {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4 md:gap-8">
           <div className="hidden md:flex gap-6 text-[24px] text-gray-400">
             <button className="hover:text-primary transition-colors cursor-pointer relative">
@@ -279,13 +339,13 @@ export default function Home() {
               <FiHelpCircle />
             </button>
           </div>
-          
+
           <button className="hidden md:block px-6 py-2.5 bg-[#1e293b] text-white rounded-lg font-bold hover:bg-slate-800 transition-all shadow-md active:scale-95 text-[13px] uppercase tracking-wider flex items-center gap-2">
             <FiUser className="text-lg" /> {content.dept_login}
           </button>
 
           {/* Mobile Toggle */}
-          <button 
+          <button
             className="md:hidden text-2xl text-gray-600 p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
@@ -327,9 +387,9 @@ export default function Home() {
       <section className="relative min-h-[500px] md:min-h-[600px] w-full overflow-hidden flex items-center justify-center">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <Image 
-            src="/munger_hero1.png" 
-            alt="Munger Hero" 
+          <Image
+            src="/munger_hero1.png"
+            alt="Munger Hero"
             fill
             className="object-cover"
             priority
@@ -341,9 +401,9 @@ export default function Home() {
         <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 md:px-14 py-16 md:py-24 text-white animate-fade-in flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-3 md:gap-4 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl mb-8 md:mb-10 border border-white/20 shadow-xl">
             <div className="w-10 h-10 md:w-11 md:h-11 relative rounded-lg overflow-hidden">
-              <Image 
-                src="/logo_indian_gov.png" 
-                alt="Bihar Govt" 
+              <Image
+                src="/logo_indian_gov.png"
+                alt="Bihar Govt"
                 fill
                 className="object-contain"
               />
@@ -358,7 +418,7 @@ export default function Home() {
             {content.hero_title} <br className="hidden md:block" />
             <span className="text-[#facc15]">{content.hero_accent}</span>
           </h2>
-          
+
           <p className="text-lg md:text-[22px] leading-relaxed text-white/90 mb-10 md:mb-12 max-w-[800px] font-medium drop-shadow-md">
             {content.hero_desc}
           </p>
@@ -376,8 +436,8 @@ export default function Home() {
           <div className="flex flex-col md:flex-row bg-white rounded-lg overflow-hidden shadow-2xl w-full max-w-[800px] group transition-all">
             <div className="flex-1 flex items-center px-6 md:px-10 bg-white">
               <FiSearch className="text-gray-400 mr-4 text-xl md:text-2xl" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={trackInput}
                 onChange={(e) => setTrackInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleTrack()}
@@ -385,7 +445,7 @@ export default function Home() {
                 className="w-full py-6 md:py-8 text-gray-900 outline-none text-lg md:text-2xl font-semibold placeholder:text-gray-400"
               />
             </div>
-            <button 
+            <button
               onClick={handleTrack}
               className="bg-[#059669] text-white px-10 md:px-16 py-6 md:py-8 text-lg md:text-[22px] font-black hover:bg-[#047857] transition-all flex items-center justify-center gap-3 active:bg-[#064e3b] uppercase tracking-widest"
             >
@@ -404,7 +464,7 @@ export default function Home() {
               <h3 className="text-lg font-serif font-bold text-slate-800 flex items-center gap-2">
                 <FiCheckCircle className="text-green-600" /> Complaint Status
               </h3>
-              <button 
+              <button
                 onClick={() => setSearchedComplaint(null)}
                 className="text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1 text-[12px] font-bold uppercase tracking-wider"
               >
@@ -537,7 +597,7 @@ export default function Home() {
               {content.svc_view_all} <FiArrowRight />
             </button>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {content.svc_list.map((service, idx) => (
               <div key={idx} className="group p-5 border border-gray-100 rounded-xl hover:border-primary/40 transition-all duration-300 text-center bg-white">
@@ -556,11 +616,11 @@ export default function Home() {
         <div className="max-w-[800px] mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-slate-800 mb-4 tracking-tight">{content.faq_title}</h2>
           <p className="text-slate-500 text-lg mb-12">{content.faq_desc}</p>
-          
+
           <div className="space-y-4 text-left">
             {faqsData.map((faq, idx) => (
               <div key={idx} className="border border-gray-100 rounded-xl overflow-hidden">
-                <button 
+                <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                   className="w-full p-5 md:p-6 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors text-left"
                 >
@@ -587,9 +647,9 @@ export default function Home() {
             ASSOCIATED INITIATIVES
           </h4>
           <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="Digital India" fill className="object-contain" /></div>
-            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="MyGov" fill className="object-contain" /></div>
-            <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="NIC" fill className="object-contain" /></div>
+            <div className="h-12 w-32 relative"><Image src="/digital_india_logo.png" alt="Digital India" fill className="object-contain" /></div>
+            <div className="h-12 w-32 relative"><Image src="/mygovlogo.png" alt="MyGov" fill className="object-contain" /></div>
+            <div className="h-12 w-32 relative"><Image src="/NIC-Logo.png" alt="NIC" fill className="object-contain" /></div>
             <div className="h-12 w-32 relative"><Image src="/logo_indian_gov.png" alt="Bihar Portal" fill className="object-contain" /></div>
           </div>
         </div>
